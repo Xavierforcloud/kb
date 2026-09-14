@@ -26,6 +26,7 @@
   --c3-bg:#fef3e0; --c3-fg:#8a5200; --c3-bar:#e0973a;
   --c4-bg:#f0eafb; --c4-fg:#4b2a8f; --c4-bar:#8a63d2;
   --c5-bg:#e4f5f7; --c5-fg:#0f5c66; --c5-bar:#37a3b0;
+  --c6-bg:#eceef3; --c6-fg:#39415c; --c6-bar:#6b7699;
 }
 @media (prefers-color-scheme: dark){
 :root{
@@ -42,6 +43,7 @@
   --c3-bg:#382a14; --c3-fg:#f2c785; --c3-bar:#e0973a;
   --c4-bg:#291d3f; --c4-fg:#c4aef5; --c4-bar:#8a63d2;
   --c5-bg:#153135; --c5-fg:#8ed7e0; --c5-bar:#37a3b0;
+  --c6-bg:#20242f; --c6-fg:#b6bdd4; --c6-bar:#6b7699;
 }
 }
 *{box-sizing:border-box}
@@ -145,6 +147,7 @@ td.slot{height:58px}
 .course.c3{background:var(--c3-bg);color:var(--c3-fg);border-color:var(--c3-bar)}
 .course.c4{background:var(--c4-bg);color:var(--c4-fg);border-color:var(--c4-bar)}
 .course.c5{background:var(--c5-bg);color:var(--c5-fg);border-color:var(--c5-bar)}
+.course.c6{background:var(--c6-bg);color:var(--c6-fg);border-color:var(--c6-bar)}
 .course.cancelled{opacity:.38;text-decoration:line-through}
 .course.live{outline:2px solid var(--live);outline-offset:-2px;animation:pulse 2.4s ease-in-out infinite}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(22,163,74,.32)}50%{box-shadow:0 0 0 6px rgba(22,163,74,0)}}
@@ -280,7 +283,9 @@ const COURSES = [
   {name:'表观遗传学',      teacher:'陶永光', room:'元定楼3楼第六教室',
                                                         day:3, periods:[5,6],     weeks:[[3,3],[6,12]],  color:3},
   {name:'临床遗传学（生科）',teacher:'李卓',  room:'T312', day:4, periods:[3,4],     weeks:[[2,17]],        color:4},
-  {name:'论文写作与学术道德',teacher:'胡德华',room:'T305', day:5, periods:[3,4],     weeks:[[2,17]],        color:5}
+  {name:'论文写作与学术道德',teacher:'胡德华',room:'T305', day:5, periods:[3,4],     weeks:[[2,17]],        color:5},
+  // 组会：每周三晚上，本学期第 3 周起（第 2 周那次不开）
+  {name:'组会',            teacher:'',       room:'',     day:3, periods:[9,10],    weeks:[[3,21]],        color:6}
 ];
 
 // 无固定节次 / 待安排
@@ -326,6 +331,8 @@ const iso = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') 
 const mins = t => { const [h,m] = t.split(':').map(Number); return h*60 + m; };
 const P = n => PERIODS[n-1];
 const last = a => a[a.length - 1];                 // 不用 Array.at()，兼容旧 iOS Safari
+// 组会这类条目没有老师/教室，直接拼会留下孤零零的「·」
+const metaOf = (...xs) => xs.filter(Boolean).join(' · ');
 
 /* 有些浏览器在 file:// 或隐私模式下访问 localStorage 会直接抛错，包一层免得整页白屏 */
 const store = {
@@ -424,8 +431,8 @@ function renderNow(now){
       '<span class="dot"></span><div class="now-main">' +
       '<div class="now-label">正在上课</div>' +
       '<div class="now-title">' + cur.c.name + (cur.c.tag ? '（' + cur.c.tag + '）' : '') + '</div>' +
-      '<div class="now-meta">' + cur.c.room + ' · ' + cur.c.teacher + ' · ' +
-        P(cur.c.periods[0]).s + '–' + P(last(cur.c.periods)).e + '</div></div>' +
+      '<div class="now-meta">' + metaOf(cur.c.room, cur.c.teacher,
+        P(cur.c.periods[0]).s + '–' + P(last(cur.c.periods)).e) + '</div></div>' +
       '<div class="now-count">还剩 ' + fmtGap(cur.end - now) + '</div>';
     return;
   }
@@ -447,9 +454,9 @@ function renderNow(now){
     '<div class="now-label">下一节课</div>' +
     '<div class="now-title">' + nx.c.name + (nx.c.tag ? '（' + nx.c.tag + '）' : '') + '</div>' +
     '<div class="now-meta">' +
-      (sameDay ? '今天' : md(nx.date) + ' ' + DAYNAME[nx.date.getDay()]) + ' ' +
-      P(nx.c.periods[0]).s + '–' + P(last(nx.c.periods)).e +
-      ' · ' + nx.c.room + ' · ' + nx.c.teacher + '</div></div>' +
+      metaOf((sameDay ? '今天' : md(nx.date) + ' ' + DAYNAME[nx.date.getDay()]) + ' ' +
+             P(nx.c.periods[0]).s + '–' + P(last(nx.c.periods)).e,
+             nx.c.room, nx.c.teacher) + '</div></div>' +
     '<div class="now-count">' + fmtGap(nx.start - now) + '后</div>';
 }
 
@@ -460,7 +467,7 @@ function courseHTML(c, opts){
   return '<div class="' + cls.join(' ') + '">' +
     '<span class="nm">' + c.name + (c.tag ? '<span class="wk"> · ' + c.tag + '</span>' : '') +
       (opts.live ? '<span class="live-tag">上课中</span>' : '') + '</span>' +
-    '<span class="mt">' + c.teacher + ' · ' + c.room + '</span>' +
+    (metaOf(c.teacher, c.room) ? '<span class="mt">' + metaOf(c.teacher, c.room) + '</span>' : '') +
     '<span class="mt wk">' + weekTxt(c) + ' · ' +
       P(c.periods[0]).s + '–' + P(last(c.periods)).e + '</span>' +
     '</div>';
