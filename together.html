@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#3fa66f">
+<meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
+<meta property="og:title" content="云 & 雨 · 此刻">
+<meta property="og:description" content="隔着十二个小时，看看对面在干嘛">
+<meta property="og:type" content="website">
+<title>云 & 雨 · 此刻</title>
+<style>
+:root{
+  --bg:#f5f6f8; --panel:#fff; --panel-2:#fafbfc; --line:#e3e6ec;
+  --text:#1b1f28; --dim:#6b7280; --faint:#9aa1ad;
+  --radius:14px;
+  --shadow:0 1px 2px rgba(16,24,40,.05), 0 6px 20px rgba(16,24,40,.06);
+  /* 云 = 她 = 绿；雨 = 他 = 蓝 */
+  --cloud:#2f8f5b; --cloud-bg:#e9f7ef; --cloud-fg:#14603a;
+  --rain:#3a72d8;  --rain-bg:#e8f0fe;  --rain-fg:#1a3d8f;
+  --sleep:#8b90a0; --sleep-bg:#eceef3;
+  --free:#f0b429;  --free-bg:#fff8e6;
+  --off-bg:#fdecef; --off-fg:#a3243c;
+}
+@media (prefers-color-scheme: dark){
+:root{
+  --bg:#0e1116; --panel:#161a21; --panel-2:#1b2029; --line:#2a313c;
+  --text:#e6e9ef; --dim:#9aa3b2; --faint:#6b7482;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 6px 20px rgba(0,0,0,.35);
+  --cloud:#4ec287; --cloud-bg:#17301f; --cloud-fg:#8fe0b4;
+  --rain:#6c9bff;  --rain-bg:#1c2a48;  --rain-fg:#a9c4ff;
+  --sleep:#767c8e; --sleep-bg:#20242f;
+  --free:#c9922a;  --free-bg:#2a2415;
+  --off-bg:#3a1e26; --off-fg:#ff9bb0;
+}
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);color:var(--text);padding:16px 14px 48px;
+  font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  -webkit-text-size-adjust:100%;
+}
+.wrap{max-width:880px;margin:0 auto}
+
+header{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+h1{font-size:19px;margin:0;font-weight:700}
+h1 .amp{color:var(--faint);font-weight:400;margin:0 2px}
+h1 .c{color:var(--cloud)} h1 .r{color:var(--rain)}
+.gap{margin-left:auto;font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums}
+.persp{display:flex;gap:6px;margin:10px 0 14px}
+.persp button{
+  font:inherit;font-size:13px;padding:6px 14px;border-radius:999px;cursor:pointer;
+  border:1px solid var(--line);background:var(--panel);color:var(--dim);
+}
+.persp button.on{border-color:transparent;color:#fff;font-weight:600}
+.persp button.on.cloud{background:var(--cloud)}
+.persp button.on.rain{background:var(--rain)}
+
+/* ── 此刻两张卡 ── */
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.card{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:14px 16px;box-shadow:var(--shadow);border-top:3px solid;position:relative;overflow:hidden;
+}
+.card.cloud{border-top-color:var(--cloud)}
+.card.rain{border-top-color:var(--rain)}
+.card .who{font-size:13px;font-weight:650;display:flex;align-items:center;gap:6px}
+.card.cloud .who{color:var(--cloud-fg)} .card.rain .who{color:var(--rain-fg)}
+.card .me-tag{font-size:10px;padding:1px 6px;border-radius:999px;background:var(--line);color:var(--dim);font-weight:600}
+.card .clock{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.5px;margin:6px 0 1px}
+.card .date{font-size:12px;color:var(--faint);font-variant-numeric:tabular-nums}
+.card .state{margin-top:11px;padding-top:11px;border-top:1px dashed var(--line)}
+.card .st-line{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:600}
+.card .ico{font-size:16px;line-height:1}
+.card .st-sub{font-size:12px;color:var(--dim);margin-top:3px;line-height:1.5}
+.card .tbd{color:var(--free);font-size:11px}
+.badge{display:inline-block;font-size:10px;padding:1px 6px;border-radius:999px;margin-left:4px;vertical-align:1px}
+.badge.off{background:var(--off-bg);color:var(--off-fg)}
+
+/* ── 双轨时间轴 ── */
+.sect{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:14px 16px 16px;box-shadow:var(--shadow);margin-bottom:14px}
+.sect h2{font-size:14px;margin:0 0 3px;font-weight:650}
+.sect .hint{font-size:12px;color:var(--faint);margin-bottom:12px;line-height:1.5}
+.tl{position:relative}
+.tl-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.tl-lab{flex:none;width:34px;font-size:12px;font-weight:650;text-align:right}
+.tl-lab.cloud{color:var(--cloud-fg)} .tl-lab.rain{color:var(--rain-fg)}
+.tl-bar{position:relative;flex:1;height:30px;border-radius:7px;overflow:hidden;background:var(--free-bg)}
+.seg{position:absolute;top:0;bottom:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.seg.class{background:var(--cloud)}
+.tl-row.rain .seg.class{background:var(--rain)}
+.seg.class span{font-size:10px;color:#fff;padding:0 4px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+.seg.sleep{background:var(--sleep-bg);
+  background-image:repeating-linear-gradient(45deg,transparent,transparent 5px,rgba(139,144,160,.25) 5px,rgba(139,144,160,.25) 10px)}
+.seg.off{background:var(--off-bg)}
+.tl-axis{display:flex;gap:8px;margin-top:2px}
+.tl-axis .tl-lab{color:var(--faint);font-weight:400}
+.tl-ticks{position:relative;flex:1;height:16px}
+.tl-ticks span{position:absolute;top:0;font-size:10px;color:var(--faint);transform:translateX(-50%);font-variant-numeric:tabular-nums}
+.nowline{position:absolute;top:0;bottom:0;width:2px;background:#e0556e;z-index:5}
+.nowline::after{content:'现在';position:absolute;top:-15px;left:50%;transform:translateX(-50%);
+  font-size:9px;color:#fff;background:#e0556e;padding:1px 4px;border-radius:3px;white-space:nowrap}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:11px;color:var(--dim)}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+
+/* ── 重叠窗口 ── */
+.win{display:flex;flex-direction:column;gap:7px}
+.wrow{display:flex;align-items:center;gap:10px;background:var(--panel-2);
+  border:1px solid var(--line);border-radius:9px;padding:9px 12px;font-size:13px}
+.wrow .when{font-weight:650;font-variant-numeric:tabular-nums;white-space:nowrap}
+.wrow .dur{margin-left:auto;font-size:11px;color:var(--dim);white-space:nowrap;font-variant-numeric:tabular-nums}
+.wrow .other{font-size:11px;color:var(--faint);font-variant-numeric:tabular-nums}
+.wrow.soon{border-color:var(--free);background:var(--free-bg)}
+.empty{color:var(--faint);font-size:13px;padding:6px 0}
+
+details{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow);overflow:hidden;margin-bottom:12px}
+summary{padding:12px 16px;cursor:pointer;font-weight:650;font-size:14px;user-select:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"▸ ";color:var(--faint)}
+details[open] summary::before{content:"▾ "}
+.dbody{padding:0 16px 14px;font-size:13px;color:var(--dim)}
+.dbody ul{margin:6px 0;padding-left:20px} .dbody li{margin:3px 0}
+.dbody b{color:var(--text);font-variant-numeric:tabular-nums}
+.warn{background:var(--free-bg);border:1px solid var(--free);border-radius:9px;
+  padding:10px 13px;font-size:12.5px;line-height:1.6;margin-bottom:14px;color:var(--text)}
+footer{margin-top:16px;text-align:center;color:var(--faint);font-size:12px;line-height:1.7}
+
+@media (max-width:640px){
+  body{padding:12px 10px 40px}
+  .pair{grid-template-columns:1fr}
+  .card .clock{font-size:23px}
+  .tl-lab{width:26px;font-size:11px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1><span class="c">云</span><span class="amp">&amp;</span><span class="r">雨</span> · 此刻</h1>
+    <span class="gap" id="gapLab"></span>
+  </header>
+  <p style="margin:0 0 2px;font-size:12px"><a href="./" style="color:var(--cloud);text-decoration:none">← 云的完整周课表</a></p>
+
+  <div class="persp">
+    <button id="bCloud" class="cloud">我是云</button>
+    <button id="bRain" class="rain">我是雨</button>
+  </div>
+
+  <div class="pair" id="pair"></div>
+
+  <div class="warn" id="warnBox"></div>
+
+  <div class="sect">
+    <h2>今天的两条轨道</h2>
+    <div class="hint" id="tlHint"></div>
+    <div class="tl" id="tl"></div>
+    <div class="legend">
+      <span><i style="background:var(--cloud)"></i>云上课</span>
+      <span><i style="background:var(--rain)"></i>雨上课</span>
+      <span><i class="seg sleep" style="background:var(--sleep-bg)"></i>睡觉</span>
+      <span><i style="background:var(--free-bg);border:1px solid var(--line)"></i>都空着</span>
+      <span><i style="background:var(--off-bg)"></i>放假 / 停课</span>
+    </div>
+  </div>
+
+  <div class="sect">
+    <h2>接下来七天，两个人都空着的时段</h2>
+    <div class="hint" id="winHint"></div>
+    <div class="win" id="win"></div>
+  </div>
+
+  <details>
+    <summary>两边的学期与假期</summary>
+    <div class="dbody" id="calBody"></div>
+  </details>
+
+  <footer id="foot"></footer>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   ① 数据区
+   ═══════════════════════════════════════════════════════════ */
+
+/* 云的节次（中南大学）；n = 上午1~4 → 1~4，下午1~4 → 5~8，晚上1~2 → 9~10 */
+const CN_PERIODS = [
+  {n:1,s:'08:00',e:'08:45'},{n:2,s:'08:55',e:'09:40'},
+  {n:3,s:'10:00',e:'10:45'},{n:4,s:'10:55',e:'11:40'},
+  {n:5,s:'14:00',e:'14:45'},{n:6,s:'14:55',e:'15:40'},
+  {n:7,s:'16:00',e:'16:45'},{n:8,s:'16:55',e:'17:40'},
+  {n:9,s:'19:00',e:'19:45'},{n:10,s:'19:55',e:'20:40'}
+];
+
+const PEOPLE = {
+  cloud: {
+    key:'cloud', who:'云', mine:'她', place:'长沙 · 中南大学', tz:'Asia/Shanghai',
+    sleep:{s:'23:30', e:'07:30'},
+    /* 按教学周排课 */
+    mode:'weeks', week1Start:'2026-09-06', totalWeeks:21, periods:CN_PERIODS,
+    courses:[
+      {name:'研究生思政课2',    day:1, periods:[1,2],     weeks:[[3,18]],        where:'T310'},
+      {name:'研究生思政课3',    day:1, periods:[5,6],     weeks:[[2,9]],         where:'T305'},
+      {name:'实验室生物安全',   day:2, periods:[1,2],     weeks:[[3,4],[6,11]],  where:'T309'},
+      {name:'实验室生物安全',   day:2, periods:[1,2,3,4], weeks:[[12,13]],       where:'孝骞楼3楼实验室', tag:'实验'},
+      {name:'表观遗传学',       day:3, periods:[5,6],     weeks:[[3,3],[6,12]],  where:'元定楼3楼第六教室'},
+      {name:'组会',             day:3, periods:[9,10],    weeks:[[3,21]],        where:''},
+      {name:'临床遗传学（生科）',day:4, periods:[3,4],     weeks:[[2,17]],        where:'T312'},
+      {name:'论文写作与学术道德',day:5, periods:[3,4],     weeks:[[2,17]],        where:'T305'}
+    ],
+    cal:[
+      {s:'2026-09-25', e:'2026-09-27', off:true,  t:'中秋节放假，全校停课'},
+      {s:'2026-10-01', e:'2026-10-07', off:true,  t:'国庆节放假，全校停课'},
+      {s:'2026-11-06', e:'2026-11-06', off:true,  t:'运动会开幕，全校停课'},
+      {s:'2027-01-30', e:'2027-02-27', off:true,  t:'寒假'},
+      {s:'2026-09-20', e:'2026-09-20', off:false, t:'周日照常上课（调课）'},
+      {s:'2026-10-10', e:'2026-10-10', off:false, t:'周六照常上课（调课）'},
+      {s:'2026-12-12', e:'2026-12-12', off:false, t:'英语四六级笔试'},
+      {s:'2027-01-29', e:'2027-01-29', off:false, t:'第一学期最后一天'}
+    ]
+  },
+
+  rain: {
+    key:'rain', who:'雨', mine:'他', place:'Arlington · Northeastern', tz:'America/New_York',
+    sleep:{s:'23:30', e:'07:30'},
+    /* 按日期区间排课 */
+    mode:'term', term:{s:'2026-09-09', e:'2026-12-13'},
+    courses:[
+      /* tbd:true → 时间是从课表截图的色块位置反推的，待用 Schedule Details 核对 */
+      {name:'Software Quality Control and Management', day:1, s:'18:00', e:'21:00', where:'', tbd:true},
+      {name:'Concepts of Object-Oriented Design',      day:2, s:'10:00', e:'13:00', where:'', tbd:true},
+      {name:'Career Management for Engineers',         day:5, s:'15:15', e:'16:50', where:'', tbd:true}
+    ],
+    cal:[
+      {s:'2026-09-07', e:'2026-09-07', off:true,  t:'Labor Day，停课'},
+      {s:'2026-10-12', e:'2026-10-12', off:true,  t:'Indigenous Peoples Day，停课'},
+      {s:'2026-11-11', e:'2026-11-11', off:true,  t:'Veterans Day，停课'},
+      {s:'2026-11-25', e:'2026-11-29', off:true,  t:'秋假 Fall break'},
+      {s:'2026-09-22', e:'2026-09-22', off:false, t:'全学期课程 add/drop 截止'},
+      {s:'2026-11-09', e:'2026-11-09', off:false, t:'春季选课开始（在读研究生）'},
+      {s:'2026-12-13', e:'2026-12-13', off:false, t:'最后一天上课'},
+      {s:'2026-12-14', e:'2026-12-20', off:false, t:'期末考试周'},
+      {s:'2026-12-23', e:'2026-12-23', off:false, t:'秋季学位授予'}
+    ]
+  }
+};
+
+/* 重叠窗口：至少多少分钟才值得列出来 */
+const MIN_WINDOW = 30;
+
+/* ═══════════════════════════════════════════════════════════
+   ② 时区与日期基础
+   ═══════════════════════════════════════════════════════════ */
+
+const WD = ['周日','周一','周二','周三','周四','周五','周六'];
+const MIN = 60000, HOUR = 3600000, DAY = 86400000;
+
+const p2 = n => String(n).padStart(2,'0');
+const mins = t => { const a = t.split(':').map(Number); return a[0]*60 + a[1]; };
+const hm = m => p2(Math.floor(m/60)%24) + ':' + p2(m%60);
+const pdate = s => { const a = s.split('-').map(Number); return {y:a[0], m:a[1], d:a[2]}; };
+const dnum = o => o.y*10000 + o.m*100 + o.d;             // 可比较的日期整数
+
+/* 缓存 formatter，重叠扫描里会调很多次 */
+const FMT = {};
+function fmt(tz){
+  return FMT[tz] || (FMT[tz] = new Intl.DateTimeFormat('en-US', {timeZone:tz,
+    year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit',
+    minute:'2-digit', hour12:false, weekday:'short'}));
+}
+/* 某个绝对时刻在 tz 的墙上时间 */
+function zparts(tz, at){
+  const o = {};
+  fmt(tz).formatToParts(at).forEach(p => o[p.type] = p.value);
+  const h = (+o.hour) % 24;
+  return { y:+o.year, m:+o.month, d:+o.day, h, mi:+o.minute,
+           wd:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(o.weekday),
+           min:h*60 + (+o.minute) };
+}
+/* 反向：tz 的墙上时间 → 绝对时刻（两次迭代足够收敛，夏令时也对） */
+function zoned(tz, y, m, d, h, mi){
+  const want = Date.UTC(y, m-1, d, h, mi);
+  let g = want;
+  for (let i = 0; i < 2; i++){
+    const p = zparts(tz, new Date(g));
+    g += want - Date.UTC(p.y, p.m-1, p.d, p.h, p.mi);
+  }
+  return g;
+}
+/* 本地日历日加减，不走毫秒（跨夏令时不会偏一天） */
+function addLocalDays(o, n){
+  const d = new Date(o.y, o.m-1, o.d + n);
+  return {y:d.getFullYear(), m:d.getMonth()+1, d:d.getDate()};
+}
+function wdOf(o){ return new Date(o.y, o.m-1, o.d).getDay(); }
+
+/* ═══════════════════════════════════════════════════════════
+   ③ 排课查询
+   ═══════════════════════════════════════════════════════════ */
+
+function calOn(p, o){
+  const n = dnum(o);
+  return p.cal.filter(e => n >= dnum(pdate(e.s)) && n <= dnum(pdate(e.e)));
+}
+const isOff = (p, o) => calOn(p, o).some(e => e.off);
+
+function weekOf(p, o){
+  const w1 = pdate(p.week1Start);
+  const diff = Math.round((new Date(o.y, o.m-1, o.d) - new Date(w1.y, w1.m-1, w1.d)) / DAY);
+  return diff < 0 ? 0 : Math.floor(diff/7) + 1;
+}
+
+/* 某人某个本地日期的课；返回 [{name, sm, em, where, tag, tbd}]，按开始时间排序 */
+function planOn(p, o){
+  if (isOff(p, o)) return [];
+  const wd = wdOf(o), day = wd === 0 ? 7 : wd;
+  let list = [];
+  if (p.mode === 'weeks'){
+    const w = weekOf(p, o);
+    if (w < 1 || w > p.totalWeeks) return [];
+    list = p.courses.filter(c => c.day === day && c.weeks.some(r => w >= r[0] && w <= r[1]))
+      .map(c => ({ name:c.name, where:c.where, tag:c.tag,
+        sm:mins(p.periods[c.periods[0]-1].s),
+        em:mins(p.periods[c.periods[c.periods.length-1]-1].e) }));
+  } else {
+    const n = dnum(o);
+    if (n < dnum(pdate(p.term.s)) || n > dnum(pdate(p.term.e))) return [];
+    list = p.courses.filter(c => c.day === day)
+      .map(c => ({ name:c.name, where:c.where, tbd:c.tbd, sm:mins(c.s), em:mins(c.e) }));
+  }
+  return list.sort((a,b) => a.sm - b.sm);
+}
+
+/* 某人从某个本地日期起，之后 n 天的「占用区间」（绝对毫秒）
+   kind: class | sleep | off */
+function blocksFor(p, startLocal, days){
+  const out = [];
+  /* 从前一天开始枚举：此刻这一觉可能是昨晚 23:30 开始的，
+     只从今天零点算会把凌晨误判成空闲 */
+  for (let i = -1; i < days; i++){
+    const o = addLocalDays(startLocal, i);
+    const mid = zoned(p.tz, o.y, o.m, o.d, 0, 0);
+
+    if (isOff(p, o)){
+      out.push({ kind:'off', a:mid, b:zoned(p.tz, o.y, o.m, o.d + 1, 0, 0),
+                 name:(calOn(p, o).find(e => e.off) || {}).t || '放假' });
+    } else {
+      planOn(p, o).forEach(c => out.push({
+        kind:'class', name:c.name, where:c.where, tag:c.tag, tbd:c.tbd,
+        a:zoned(p.tz, o.y, o.m, o.d, Math.floor(c.sm/60), c.sm%60),
+        b:zoned(p.tz, o.y, o.m, o.d, Math.floor(c.em/60), c.em%60)
+      }));
+    }
+    /* 睡觉：当晚 sleep.s → 次日 sleep.e */
+    const ss = mins(p.sleep.s), se = mins(p.sleep.e), nx = addLocalDays(o, 1);
+    out.push({ kind:'sleep', name:'睡觉',
+      a:zoned(p.tz, o.y, o.m, o.d, Math.floor(ss/60), ss%60),
+      b:zoned(p.tz, nx.y, nx.m, nx.d, Math.floor(se/60), se%60) });
+  }
+  return out.sort((x,y) => x.a - y.a);
+}
+
+/* 此刻状态 */
+function statusAt(p, at){
+  const t = zparts(p.tz, at), o = {y:t.y, m:t.m, d:t.d};
+  const offEv = calOn(p, o).find(e => e.off);
+  const sleeping = (() => {
+    const ss = mins(p.sleep.s), se = mins(p.sleep.e);
+    return ss > se ? (t.min >= ss || t.min < se) : (t.min >= ss && t.min < se);
+  })();
+
+  if (!offEv){
+    const hit = planOn(p, o).find(c => t.min >= c.sm && t.min < c.em);
+    if (hit) return { kind:'class', t, c:hit,
+      endsAt:zoned(p.tz, o.y, o.m, o.d, Math.floor(hit.em/60), hit.em%60) };
+  }
+  if (sleeping) return { kind:'sleep', t, offEv };
+  return { kind:offEv ? 'off' : 'free', t, offEv, next:nextClass(p, at) };
+}
+
+function nextClass(p, at){
+  let o = zparts(p.tz, at), cur = {y:o.y, m:o.m, d:o.d};
+  for (let i = 0; i < 40; i++){
+    const day = addLocalDays(cur, i);
+    for (const c of planOn(p, day)){
+      const a = zoned(p.tz, day.y, day.m, day.d, Math.floor(c.sm/60), c.sm%60);
+      if (a > at) return { c, at:a, sameDay:i === 0 };
+    }
+  }
+  return null;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ④ 区间运算：找两人都空着的窗口
+   ═══════════════════════════════════════════════════════════ */
+
+function merge(rs){
+  const s = rs.slice().sort((a,b) => a.a - b.a), out = [];
+  s.forEach(r => {
+    const t = out[out.length-1];
+    if (t && r.a <= t.b) t.b = Math.max(t.b, r.b);
+    else out.push({a:r.a, b:r.b});
+  });
+  return out;
+}
+/* [from, to] 减去 busy */
+function freeGaps(from, to, busy){
+  const out = []; let cur = from;
+  merge(busy).forEach(r => {
+    if (r.b <= from || r.a >= to) return;
+    if (r.a > cur) out.push({a:cur, b:Math.min(r.a, to)});
+    cur = Math.max(cur, r.b);
+  });
+  if (cur < to) out.push({a:cur, b:to});
+  return out.filter(g => g.b - g.a >= MIN_WINDOW * MIN);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ⑤ 渲染
+   ═══════════════════════════════════════════════════════════ */
+
+const store = {
+  get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
+  set(k,v){ try { localStorage.setItem(k,v); } catch(e){} }
+};
+/* 默认视角：设备在东八区就当是云，否则是雨 */
+function guessMe(){
+  const saved = store.get('me');
+  if (saved === 'cloud' || saved === 'rain') return saved;
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+    if (/Shanghai|Chongqing|Urumqi|Hong_Kong|Taipei|Asia/.test(tz)) return 'cloud';
+  } catch(e){}
+  return 'rain';
+}
+let ME = guessMe();
+
+const ICON = { class:'📚', sleep:'🌙', free:'🫧', off:'🏖️' };
+const fmtDur = ms => {
+  const m = Math.round(ms/MIN), h = Math.floor(m/60);
+  return h ? (h + ' 小时' + (m%60 ? ' ' + (m%60) + ' 分' : '')) : (m + ' 分钟');
+};
+
+function stateText(p, st, at){
+  if (st.kind === 'class'){
+    const c = st.c;
+    return { line:'正在上 ' + c.name + (c.tag ? '（' + c.tag + '）' : ''),
+      sub:[c.where, hm(c.sm) + '–' + hm(c.em), '还剩 ' + fmtDur(st.endsAt - at)]
+           .filter(Boolean).join(' · ') + (c.tbd ? ' ⚠' : '') };
+  }
+  if (st.kind === 'sleep')
+    return { line:'大概在睡觉', sub:'当地 ' + p.sleep.s + '–' + p.sleep.e + ' 按睡觉算' };
+  if (st.kind === 'off')
+    return { line:'放假中', sub:st.offEv.t };
+  const n = st.next;
+  return { line:'没课，空着',
+    sub:n ? ('下一节 ' + n.c.name + ' · ' +
+             (n.sameDay ? '今天' : (n.at - at < 2*DAY ? '明天' : WD[zparts(p.tz, new Date(n.at)).wd])) +
+             ' ' + hm(n.c.sm) + ' · ' + fmtDur(n.at - at) + '后')
+           : '接下来没有排课' };
+}
+
+function renderPair(at){
+  const order = ME === 'cloud' ? ['cloud','rain'] : ['rain','cloud'];
+  document.getElementById('pair').innerHTML = order.map(k => {
+    const p = PEOPLE[k], st = statusAt(p, at), t = st.t, s = stateText(p, st, at);
+    return '<div class="card ' + k + '">' +
+      '<div class="who">' + p.who +
+        (k === ME ? '<span class="me-tag">我</span>' : '') +
+        '<span style="color:var(--faint);font-weight:400;font-size:11px;margin-left:auto">' + p.place + '</span></div>' +
+      '<div class="clock">' + p2(t.h) + ':' + p2(t.mi) + '</div>' +
+      '<div class="date">' + t.m + '月' + t.d + '日 ' + WD[t.wd] +
+        (p.mode === 'weeks' && weekOf(p, t) >= 1 && weekOf(p, t) <= p.totalWeeks
+          ? ' · 第 ' + weekOf(p, t) + ' 周' : '') +
+        (isOff(p, {y:t.y,m:t.m,d:t.d}) ? '<span class="badge off">停课</span>' : '') + '</div>' +
+      '<div class="state"><div class="st-line"><span class="ico">' + ICON[st.kind] + '</span>' +
+        s.line + '</div><div class="st-sub">' + s.sub + '</div></div>' +
+    '</div>';
+  }).join('');
+
+  /* 时差是动态的：美国 11/1 退出夏令时后会从 12 小时变成 13 小时 */
+  const a = zparts(PEOPLE.cloud.tz, at), b = zparts(PEOPLE.rain.tz, at);
+  const diff = Math.round((Date.UTC(a.y,a.m-1,a.d,a.h,a.mi) - Date.UTC(b.y,b.m-1,b.d,b.h,b.mi)) / HOUR);
+  document.getElementById('gapLab').textContent = '云比雨快 ' + diff + ' 小时';
+}
+
+function renderTimeline(at){
+  const me = PEOPLE[ME], other = PEOPLE[ME === 'cloud' ? 'rain' : 'cloud'];
+  const t = zparts(me.tz, at);
+  const from = zoned(me.tz, t.y, t.m, t.d, 0, 0);
+  const to = zoned(me.tz, ...(o => [o.y, o.m, o.d, 0, 0])(addLocalDays(t, 1)));
+  const span = to - from;
+  const pct = x => ((x - from) / span * 100);
+
+  const row = p => {
+    const cls = p.key;
+    const segs = blocksFor(p, zparts(p.tz, new Date(from)), 3)
+      .filter(b => b.b > from && b.a < to)
+      .map(b => {
+        const L = Math.max(0, pct(b.a)), R = Math.min(100, pct(b.b));
+        const label = b.kind === 'class' && (R - L) > 9
+          ? '<span>' + b.name.slice(0, 22) + '</span>' : '';
+        return '<div class="seg ' + b.kind + '" style="left:' + L + '%;width:' + (R-L) + '%" title="' +
+          b.name + '">' + label + '</div>';
+      }).join('');
+    return '<div class="tl-row ' + cls + '"><div class="tl-lab ' + cls + '">' + p.who + '</div>' +
+      '<div class="tl-bar">' + segs +
+      (at >= from && at < to ? '<div class="nowline" style="left:' + pct(at) + '%"></div>' : '') +
+      '</div></div>';
+  };
+
+  const ticks = who => {
+    let h = '';
+    for (let i = 0; i <= 24; i += 3){
+      const inst = from + i * HOUR;
+      if (inst > to) break;
+      h += '<span style="left:' + pct(inst) + '%">' + p2(zparts(who.tz, new Date(inst)).h) + '</span>';
+    }
+    return '<div class="tl-axis"><div class="tl-lab">' + who.who +
+      '</div><div class="tl-ticks">' + h + '</div></div>';
+  };
+
+  document.getElementById('tl').innerHTML = row(me) + row(other) + ticks(me) + ticks(other);
+  document.getElementById('tlHint').innerHTML =
+    '同一条横轴是同一个绝对时刻，所以两行对得上。下面两排刻度分别是 ' +
+    me.who + ' 和 ' + other.who + ' 的当地钟点 —— 差出来的那一截就是时差。' +
+    '轴的范围是 <b>' + me.who + '</b> 当地的 ' + t.m + '月' + t.d + '日 00:00–24:00。';
+}
+
+function renderWindows(at){
+  const me = PEOPLE[ME], other = PEOPLE[ME === 'cloud' ? 'rain' : 'cloud'];
+  const days = 8;
+  const busy = [];
+  [me, other].forEach(p => blocksFor(p, zparts(p.tz, at), days).forEach(b => busy.push(b)));
+  const to = at + 7 * DAY;
+  const gaps = freeGaps(at, to, busy).slice(0, 10);
+
+  const el = document.getElementById('win');
+  if (!gaps.length){ el.innerHTML = '<div class="empty">七天之内没找到两人都空着且都醒着的时段。</div>'; return; }
+
+  const dayName = inst => {
+    const a = zparts(me.tz, new Date(inst)), n = zparts(me.tz, at);
+    const d = Math.round((Date.UTC(a.y,a.m-1,a.d) - Date.UTC(n.y,n.m-1,n.d)) / DAY);
+    return d === 0 ? '今天' : d === 1 ? '明天' : d === 2 ? '后天' : (a.m + '.' + a.d + ' ' + WD[a.wd]);
+  };
+  el.innerHTML = gaps.map((g, i) => {
+    const A = zparts(me.tz, new Date(g.a)), B = zparts(me.tz, new Date(g.b));
+    const oa = zparts(other.tz, new Date(g.a)), ob = zparts(other.tz, new Date(g.b));
+    return '<div class="wrow' + (i === 0 ? ' soon' : '') + '">' +
+      '<span class="when">' + dayName(g.a) + ' ' + p2(A.h) + ':' + p2(A.mi) +
+        '–' + p2(B.h) + ':' + p2(B.mi) + '</span>' +
+      '<span class="other">' + other.who + '那边 ' + oa.m + '.' + oa.d + ' ' +
+        p2(oa.h) + ':' + p2(oa.mi) + '–' + p2(ob.h) + ':' + p2(ob.mi) + '</span>' +
+      '<span class="dur">' + fmtDur(g.b - g.a) + '</span></div>';
+  }).join('');
+  document.getElementById('winHint').innerHTML =
+    '时间按 <b>' + me.who + '</b> 的当地钟点写，后面那行小字是同一时刻在 ' + other.who +
+    ' 那边几点。已经排除了双方的课、放假日和睡觉时间（当地 ' + me.sleep.s + '–' + me.sleep.e +
+    '），只列 ' + MIN_WINDOW + ' 分钟以上的空档。';
+}
+
+function renderCal(){
+  document.getElementById('calBody').innerHTML = ['cloud','rain'].map(k => {
+    const p = PEOPLE[k];
+    const head = p.mode === 'weeks'
+      ? '第一学期 2026.9.6 — 2027.1.29，共 ' + p.totalWeeks + ' 教学周'
+      : 'Fall 2026：' + p.term.s.slice(5).replace('-','/') + ' 开课 — ' + p.term.e.slice(5).replace('-','/') + ' 最后一天课';
+    return '<p style="margin:8px 0 2px;color:var(--text);font-weight:650">' + p.who +
+      ' · ' + p.place + '</p><p style="margin:0 0 4px">' + head + '</p><ul>' +
+      p.cal.map(e => '<li><b>' + e.s.slice(5).replace('-','.') +
+        (e.s === e.e ? '' : '–' + e.e.slice(5).replace('-','.')) + '</b> ' + e.t +
+        (e.off ? '' : '') + '</li>').join('') + '</ul>';
+  }).join('');
+}
+
+function renderWarn(){
+  const tbd = PEOPLE.rain.courses.filter(c => c.tbd);
+  document.getElementById('warnBox').innerHTML = !tbd.length ? '' :
+    '⚠ <b>雨这三门课的时间还没核对过</b>：' +
+    tbd.map(c => c.name + ' ' + c.s + '–' + c.e).join('；') +
+    '。这是从课表截图的色块位置反推的，可能差十几分钟。' +
+    '在选课系统的「Schedule Details」标签页能看到精确时间，核对后改数据区 <code>PEOPLE.rain.courses</code> 即可。';
+  document.getElementById('warnBox').style.display = tbd.length ? '' : 'none';
+}
+
+function setMe(k){
+  ME = k; store.set('me', k);
+  document.getElementById('bCloud').className = 'cloud' + (k === 'cloud' ? ' on' : '');
+  document.getElementById('bRain').className  = 'rain'  + (k === 'rain'  ? ' on' : '');
+  tick(true);
+}
+
+let lastMinute = '';
+function tick(force){
+  const at = Date.now();
+  renderPair(at);
+  const key = Math.floor(at / MIN) + ME;
+  if (force || key !== lastMinute){
+    lastMinute = key;
+    renderTimeline(at);
+    renderWindows(at);
+  }
+}
+
+(function init(){
+  document.getElementById('bCloud').onclick = () => setMe('cloud');
+  document.getElementById('bRain').onclick  = () => setMe('rain');
+  renderCal();
+  renderWarn();
+  document.getElementById('foot').innerHTML =
+    '云的课表来自中南大学教务课表与 2026—2027 校历；雨的来自 Northeastern 秋季课表与 University-Wide Academic Calendar。<br>' +
+    '两边时间都按各自时区实时换算，时差随美国夏令时自动变化（11 月 1 日后由 12 小时变 13 小时）。';
+  setMe(ME);
+  setInterval(tick, 1000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) tick(true); });
+})();
+</script>
+</body>
+</html>
