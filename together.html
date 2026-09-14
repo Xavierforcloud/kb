@@ -115,6 +115,57 @@ h1 .c{color:var(--cloud)} h1 .r{color:var(--rain)}
 .wrow.soon{border-color:var(--free);background:var(--free-bg)}
 .empty{color:var(--faint);font-size:13px;padding:6px 0}
 
+/* ── 按周看 ── */
+.wknav{display:flex;align-items:center;gap:7px;margin-bottom:8px;flex-wrap:wrap}
+.wknav button{font:inherit;font-size:13px;padding:5px 11px;border-radius:9px;cursor:pointer;
+  border:1px solid var(--line);background:var(--panel);color:var(--text)}
+.wknav button:hover{border-color:var(--rain)}
+.wknav button.primary{background:var(--rain);border-color:var(--rain);color:#fff}
+.wknav .wklab{font-size:13px;font-weight:650;font-variant-numeric:tabular-nums;min-width:160px;text-align:center}
+
+.wk{border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.wk-head{display:flex;background:var(--panel-2);border-bottom:1px solid var(--line)}
+.wk-head .ax{flex:none;width:34px;border-right:1px solid var(--line)}
+.wk-head .hc{flex:1;text-align:center;padding:6px 2px;font-size:12px;font-weight:650;
+  border-left:1px solid var(--line);line-height:1.3}
+.wk-head .hc:first-of-type{border-left:none}
+.wk-head .hc span{display:block;font-size:10px;color:var(--faint);font-weight:400;font-variant-numeric:tabular-nums}
+.wk-head .hc.today{background:var(--free-bg);box-shadow:inset 0 -2px 0 var(--free)}
+.wk-body{display:flex;position:relative;height:504px}
+.wk-ax{flex:none;width:34px;position:relative;border-right:1px solid var(--line);background:var(--panel-2)}
+.wk-ax span{position:absolute;right:3px;font-size:9.5px;color:var(--faint);
+  transform:translateY(-50%);font-variant-numeric:tabular-nums}
+.wk-cols{flex:1;display:flex;position:relative}
+.wk-col{flex:1;display:flex;position:relative;border-left:1px solid var(--line)}
+.wk-col:first-child{border-left:none}
+.wk-col.today{background:var(--free-bg)}
+.wk-hr{position:absolute;left:0;right:0;height:1px;background:var(--line);opacity:.55;pointer-events:none}
+.lane{position:relative;flex:1;min-width:0}
+.lane + .lane{border-left:1px dashed var(--line)}
+.wb{position:absolute;left:1px;right:1px;border-radius:4px;overflow:hidden;
+  font-size:9px;line-height:1.2;padding:2px 3px;color:#fff}
+.wb.cloud{background:var(--cloud)} .wb.rain{background:var(--rain)}
+.wb.sleep{background:var(--sleep-bg);color:transparent;border-radius:0;left:0;right:0;
+  background-image:repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(139,144,160,.3) 4px,rgba(139,144,160,.3) 8px)}
+.wb.off{background:var(--off-bg);color:var(--off-fg);border-radius:0;left:0;right:0}
+.wb b{font-weight:650;display:block}
+.wknow{position:absolute;left:0;right:0;height:2px;background:#e0556e;z-index:6}
+
+.wklist{display:none;flex-direction:column;gap:9px}
+.wkday{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--panel-2)}
+.wkday-h{display:flex;align-items:center;gap:7px;padding:8px 12px;font-size:13px;font-weight:650;
+  background:var(--panel);border-bottom:1px solid var(--line)}
+.wkday-h .d{color:var(--faint);font-weight:400;font-size:11px;font-variant-numeric:tabular-nums}
+.wkday.today .wkday-h{background:var(--free-bg);box-shadow:inset 0 -1px 0 var(--free)}
+.wkday-b{padding:7px 10px;display:flex;flex-direction:column;gap:5px}
+.wkitem{display:flex;gap:9px;align-items:flex-start;font-size:12.5px}
+.wkitem .t{flex:none;width:80px;font-variant-numeric:tabular-nums;color:var(--dim);font-size:11.5px;line-height:1.45}
+.wkitem .n{flex:1;min-width:0;border-left:3px solid;padding-left:7px;line-height:1.45}
+.wkitem.cloud .n{border-color:var(--cloud)} .wkitem.rain .n{border-color:var(--rain)}
+.wkitem .w{display:block;font-size:11px;color:var(--faint)}
+.wkitem .own{font-size:10px;padding:0 5px;border-radius:999px;margin-right:4px;vertical-align:1px;color:#fff}
+.wkitem.cloud .own{background:var(--cloud)} .wkitem.rain .own{background:var(--rain)}
+
 details{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
   box-shadow:var(--shadow);overflow:hidden;margin-bottom:12px}
 summary{padding:12px 16px;cursor:pointer;font-weight:650;font-size:14px;user-select:none}
@@ -128,11 +179,14 @@ details[open] summary::before{content:"▾ "}
   padding:10px 13px;font-size:12.5px;line-height:1.6;margin-bottom:14px;color:var(--text)}
 footer{margin-top:16px;text-align:center;color:var(--faint);font-size:12px;line-height:1.7}
 
-@media (max-width:640px){
+@media (max-width:760px){
   body{padding:12px 10px 40px}
   .pair{grid-template-columns:1fr}
   .card .clock{font-size:23px}
   .tl-lab{width:26px;font-size:11px}
+  .wk{display:none}
+  .wklist{display:flex}
+  .wknav .wklab{min-width:0;flex:1}
 }
 </style>
 </head>
@@ -165,6 +219,19 @@ footer{margin-top:16px;text-align:center;color:var(--faint);font-size:12px;line-
       <span><i style="background:var(--free-bg);border:1px solid var(--line)"></i>都空着</span>
       <span><i style="background:var(--off-bg)"></i>放假 / 停课</span>
     </div>
+  </div>
+
+  <div class="sect">
+    <h2>按周看</h2>
+    <div class="wknav">
+      <button id="wPrev" title="上一周">◀</button>
+      <span class="wklab" id="wkLab"></span>
+      <button id="wNext" title="下一周">▶</button>
+      <button id="wNow" class="primary">回到本周</button>
+    </div>
+    <div class="hint" id="wkHint"></div>
+    <div class="wk" id="wkGrid"></div>
+    <div class="wklist" id="wkList"></div>
   </div>
 
   <div class="sect">
@@ -225,14 +292,17 @@ const PEOPLE = {
 
   rain: {
     key:'rain', who:'雨', mine:'他', place:'Arlington · Northeastern', tz:'America/New_York',
-    sleep:{s:'23:30', e:'07:30'},
+    sleep:{s:'00:00', e:'09:00'},
     /* 按日期区间排课 */
     mode:'term', term:{s:'2026-09-09', e:'2026-12-13'},
     courses:[
-      /* tbd:true → 时间是从课表截图的色块位置反推的，待用 Schedule Details 核对 */
-      {name:'Software Quality Control and Management', day:1, s:'18:00', e:'21:00', where:'', tbd:true},
-      {name:'Concepts of Object-Oriented Design',      day:2, s:'10:00', e:'13:00', where:'', tbd:true},
-      {name:'Career Management for Engineers',         day:5, s:'15:15', e:'16:50', where:'', tbd:true}
+      {code:'INFO 6255', name:'Software Quality Control & Management',
+        day:1, s:'18:00', e:'21:30', where:'Arlington Tower 1504'},
+      {code:'CSYE 6200', name:'Concepts of Object-Oriented Design',
+        day:2, s:'10:00', e:'13:10', where:'Arlington Tower 1530'},
+      /* tbd:true → 只知道 15:30 东部开始（＝太平洋 12:30），结束时间是按截图色块量的 */
+      {code:'ENCP 6000', name:'Career Management for Engineers',
+        day:5, s:'15:30', e:'16:50', where:'Zoom', tbd:true}
     ],
     cal:[
       {s:'2026-09-07', e:'2026-09-07', off:true,  t:'Labor Day，停课'},
@@ -329,7 +399,8 @@ function planOn(p, o){
     const n = dnum(o);
     if (n < dnum(pdate(p.term.s)) || n > dnum(pdate(p.term.e))) return [];
     list = p.courses.filter(c => c.day === day)
-      .map(c => ({ name:c.name, where:c.where, tbd:c.tbd, sm:mins(c.s), em:mins(c.e) }));
+      .map(c => ({ name:c.name, code:c.code, where:c.where, tbd:c.tbd,
+                   sm:mins(c.s), em:mins(c.e) }));
   }
   return list.sort((a,b) => a.sm - b.sm);
 }
@@ -349,17 +420,21 @@ function blocksFor(p, startLocal, days){
                  name:(calOn(p, o).find(e => e.off) || {}).t || '放假' });
     } else {
       planOn(p, o).forEach(c => out.push({
-        kind:'class', name:c.name, where:c.where, tag:c.tag, tbd:c.tbd,
+        kind:'class', name:c.name, code:c.code, where:c.where, tag:c.tag, tbd:c.tbd,
+        owner:p.key, sm:c.sm, em:c.em,
         a:zoned(p.tz, o.y, o.m, o.d, Math.floor(c.sm/60), c.sm%60),
         b:zoned(p.tz, o.y, o.m, o.d, Math.floor(c.em/60), c.em%60)
       }));
     }
-    /* 睡觉：当晚 sleep.s → 次日 sleep.e */
-    const ss = mins(p.sleep.s), se = mins(p.sleep.e), nx = addLocalDays(o, 1);
+    /* 睡觉：23:30–07:30 那种要跨到次日，00:00–09:00 这种在同一天内，
+       一律按次日算会变成 33 小时的睡觉区间 */
+    const ss = mins(p.sleep.s), se = mins(p.sleep.e);
+    const ed = ss > se ? addLocalDays(o, 1) : o;
     out.push({ kind:'sleep', name:'睡觉',
       a:zoned(p.tz, o.y, o.m, o.d, Math.floor(ss/60), ss%60),
-      b:zoned(p.tz, nx.y, nx.m, nx.d, Math.floor(se/60), se%60) });
+      b:zoned(p.tz, ed.y, ed.m, ed.d, Math.floor(se/60), se%60) });
   }
+  out.forEach(b => b.owner = p.key);
   return out.sort((x,y) => x.a - y.a);
 }
 
@@ -562,6 +637,133 @@ function renderWindows(at){
     '），只列 ' + MIN_WINDOW + ' 分钟以上的空档。';
 }
 
+/* ── 按周看：网格 + 手机列表 ───────────────────────────────
+   横轴是「我」的本地日期，纵轴是「我」的本地钟点。
+   对方的课按绝对时刻换算过来，所以她的早八会落在我的前一天晚上。 */
+let wkOff = 0;
+
+function renderWeekView(at){
+  const me = PEOPLE[ME], other = PEOPLE[ME === 'cloud' ? 'rain' : 'cloud'];
+  const tp = zparts(me.tz, new Date(at));
+  const todayL = {y:tp.y, m:tp.m, d:tp.d};
+  const sun = addLocalDays(todayL, -wdOf(todayL) + wkOff * 7);
+
+  const days = [];
+  for (let i = 0; i < 7; i++){
+    const o = addLocalDays(sun, i), nx = addLocalDays(o, 1);
+    days.push({ o, wd:wdOf(o),
+      a:zoned(me.tz, o.y, o.m, o.d, 0, 0),
+      b:zoned(me.tz, nx.y, nx.m, nx.d, 0, 0),
+      today:dnum(o) === dnum(todayL) });
+  }
+  const wa = days[0].a, wb = days[6].b;
+
+  /* 收集两人的区间，多取几天保证覆盖时区偏移 */
+  const all = [];
+  [me, other].forEach(p => {
+    const from = zparts(p.tz, new Date(wa - DAY));
+    blocksFor(p, {y:from.y, m:from.m, d:from.d}, 10)
+      .filter(b => b.b > wa && b.a < wb).forEach(b => all.push(b));
+  });
+
+  /* 切到各个本地日列里，跨本地午夜的自动拆成两段 */
+  const cells = days.map(() => []);
+  all.forEach(blk => days.forEach((d, i) => {
+    const a = Math.max(blk.a, d.a), z = Math.min(blk.b, d.b);
+    if (z <= a) return;
+    cells[i].push({ kind:blk.kind, owner:blk.owner, name:blk.name, code:blk.code,
+      where:blk.where, tag:blk.tag, tbd:blk.tbd, a:a, b:z,
+      top:(a - d.a) / (d.b - d.a) * 100, h:(z - a) / (d.b - d.a) * 100 });
+  }));
+
+  /* 周标签：她的教学周按周中那天在她本地的日期算 */
+  const midHer = zparts(PEOPLE.cloud.tz, new Date(days[3].a));
+  const hw = weekOf(PEOPLE.cloud, {y:midHer.y, m:midHer.m, d:midHer.d});
+  document.getElementById('wkLab').textContent =
+    days[0].o.m + '.' + days[0].o.d + ' — ' + days[6].o.m + '.' + days[6].o.d +
+    (hw >= 1 && hw <= PEOPLE.cloud.totalWeeks ? ' · 云第 ' + hw + ' 周' : '') +
+    (wkOff === 0 ? ' · 本周' : '');
+  document.getElementById('wkHint').innerHTML =
+    '纵轴是 <b>' + me.who + '</b> 当地的 0–24 点，每天分两条：左边 ' + me.who +
+    '，右边 ' + other.who + '。' + other.who + '的课是按绝对时刻换算过来的，' +
+    '所以' + (ME === 'rain' ? '她的早八会落在你前一天的晚上' : '他的晚课会落在你第二天的早上') +
+    '。斜纹是睡觉。';
+
+  /* ── 网格 ── */
+  const tlab = (p, frac) => p2(zparts(p.tz, new Date(days[0].a + frac * (days[0].b - days[0].a))).h);
+  let head = '<div class="wk-head"><div class="ax"></div>' + days.map(d =>
+    '<div class="hc' + (d.today ? ' today' : '') + '">' + WD[d.wd] +
+    '<span>' + d.o.m + '.' + d.o.d + '</span></div>').join('') + '</div>';
+
+  let ax = '';
+  for (let h = 0; h <= 24; h += 2)
+    ax += '<span style="top:' + (h/24*100) + '%">' + p2(h % 24) + '</span>';
+
+  let hrs = '';
+  for (let h = 2; h < 24; h += 2) hrs += '<div class="wk-hr" style="top:' + (h/24*100) + '%"></div>';
+
+  const cols = days.map((d, i) => {
+    const lane = own => cells[i].filter(c => c.owner === own).map(c => {
+      if (c.kind === 'sleep' || c.kind === 'off')
+        return '<div class="wb ' + c.kind + '" style="top:' + c.top + '%;height:' + c.h +
+               '%" title="' + c.name + '"></div>';
+      const txt = c.h > 5
+        ? '<b>' + (c.code || c.name).slice(0, 14) + '</b>' +
+          (c.h > 9 ? p2(zparts(PEOPLE[own].tz, new Date(c.a)).h) + ':' +
+                     p2(zparts(PEOPLE[own].tz, new Date(c.a)).mi) : '')
+        : '';
+      return '<div class="wb ' + own + '" style="top:' + c.top + '%;height:' + c.h + '%" title="' +
+        [c.code, c.name, c.where].filter(Boolean).join(' · ') + '">' + txt + '</div>';
+    }).join('');
+    const now = (at >= d.a && at < d.b)
+      ? '<div class="wknow" style="top:' + ((at - d.a) / (d.b - d.a) * 100) + '%"></div>' : '';
+    return '<div class="wk-col' + (d.today ? ' today' : '') + '">' +
+      '<div class="lane">' + lane(me.key) + '</div>' +
+      '<div class="lane">' + lane(other.key) + '</div>' + now + '</div>';
+  }).join('');
+
+  document.getElementById('wkGrid').innerHTML = head +
+    '<div class="wk-body"><div class="wk-ax">' + ax + '</div>' +
+    '<div class="wk-cols">' + hrs + cols + '</div></div>';
+
+  /* ── 手机列表：两人的课按「我」的当地时间合并排序 ── */
+  document.getElementById('wkList').innerHTML = days.map((d, i) => {
+    const items = cells[i].filter(c => c.kind === 'class').sort((x, y) => x.a - y.a);
+    const off = cells[i].filter(c => c.kind === 'off');
+    if (!items.length && !d.today && !off.length) return '';
+    let body = '';
+    if (!items.length) body = '<div class="wkitem"><span class="t">—</span>' +
+      '<span class="n" style="border-color:var(--line);color:var(--faint)">两个人都没课</span></div>';
+    items.forEach(c => {
+      const P1 = PEOPLE[c.owner], la = zparts(me.tz, new Date(c.a)), lb = zparts(me.tz, new Date(c.b));
+      const oa = zparts(P1.tz, new Date(c.a)), ob = zparts(P1.tz, new Date(c.b));
+      body += '<div class="wkitem ' + c.owner + '">' +
+        '<span class="t">' + p2(la.h) + ':' + p2(la.mi) + '<br>' + p2(lb.h) + ':' + p2(lb.mi) + '</span>' +
+        '<span class="n"><span class="own">' + P1.who + '</span>' +
+          (c.code ? c.code + ' ' : '') + c.name + (c.tag ? '（' + c.tag + '）' : '') +
+          (c.tbd ? ' ⚠' : '') +
+          '<span class="w">' + [c.where, c.owner === me.key ? '' :
+            (P1.who + '那边 ' + p2(oa.h) + ':' + p2(oa.mi) + '–' + p2(ob.h) + ':' + p2(ob.mi))]
+            .filter(Boolean).join(' · ') + '</span></span></div>';
+    });
+    return '<div class="wkday' + (d.today ? ' today' : '') + '">' +
+      '<div class="wkday-h">' + WD[d.wd] + '<span class="d">' + d.o.m + '.' + d.o.d + '</span>' +
+      /* 我的一个本地日会横跨对方两个本地日，其中可能只有一天放假 —— 标上是对方哪天，
+         否则会出现「云放假」却又列着云的课这种看着矛盾的情况；同一天多段要去重 */
+      (function(){
+        const tags = [];
+        off.forEach(o => {
+          const q = zparts(PEOPLE[o.owner].tz, new Date(o.a));
+          const s = PEOPLE[o.owner].who + ' ' + q.m + '.' + q.d + ' 放假';
+          if (tags.indexOf(s) < 0) tags.push(s);
+        });
+        return tags.length ? '<span class="d" style="margin-left:auto;color:var(--off-fg)">' +
+          tags.join(' · ') + '</span>' : '';
+      })() +
+      '</div><div class="wkday-b">' + body + '</div></div>';
+  }).join('') || '<div class="empty">这一周两个人都没有排课。</div>';
+}
+
 function renderCal(){
   document.getElementById('calBody').innerHTML = ['cloud','rain'].map(k => {
     const p = PEOPLE[k];
@@ -579,10 +781,11 @@ function renderCal(){
 function renderWarn(){
   const tbd = PEOPLE.rain.courses.filter(c => c.tbd);
   document.getElementById('warnBox').innerHTML = !tbd.length ? '' :
-    '⚠ <b>雨这三门课的时间还没核对过</b>：' +
-    tbd.map(c => c.name + ' ' + c.s + '–' + c.e).join('；') +
-    '。这是从课表截图的色块位置反推的，可能差十几分钟。' +
-    '在选课系统的「Schedule Details」标签页能看到精确时间，核对后改数据区 <code>PEOPLE.rain.courses</code> 即可。';
+    '⚠ ' + tbd.map(c => '<b>' + c.code + '</b> 只确认了 ' + c.s +
+      ' 开始，结束时间 ' + c.e + ' 是按课表截图量的').join('；') +
+    '。另外云的作息还是按 ' + PEOPLE.cloud.sleep.s + '–' + PEOPLE.cloud.sleep.e +
+    ' 估的（雨已按 ' + PEOPLE.rain.sleep.s + '–' + PEOPLE.rain.sleep.e +
+    ' 设好）。这两项会影响下面「都空着的时段」算得准不准。';
   document.getElementById('warnBox').style.display = tbd.length ? '' : 'none';
 }
 
@@ -601,6 +804,7 @@ function tick(force){
   if (force || key !== lastMinute){
     lastMinute = key;
     renderTimeline(at);
+    renderWeekView(at);
     renderWindows(at);
   }
 }
@@ -608,6 +812,13 @@ function tick(force){
 (function init(){
   document.getElementById('bCloud').onclick = () => setMe('cloud');
   document.getElementById('bRain').onclick  = () => setMe('rain');
+  document.getElementById('wPrev').onclick = () => { wkOff--; tick(true); };
+  document.getElementById('wNext').onclick = () => { wkOff++; tick(true); };
+  document.getElementById('wNow').onclick  = () => { wkOff = 0; tick(true); };
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft')  { wkOff--; tick(true); }
+    if (e.key === 'ArrowRight') { wkOff++; tick(true); }
+  });
   renderCal();
   renderWarn();
   document.getElementById('foot').innerHTML =
